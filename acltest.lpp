@@ -1,0 +1,130 @@
+
+; include cons for heterogeneous (typesafe) lists
+(include "cons.cpp")
+
+(def t true)
+(def nil false)
+
+; automatic returns work
+(defun abs (x) (if (>= x 0) x (* -1 x)))
+
+; C++ style overloading still works
+(defun: auto natp (int x) (> x 0))
+(defun natp (x) false)
+
+(defun mod (x y) (% x y))
+
+(defun: auto intp (int x) true)
+(defun intp (x) false)
+
+(defun: auto booleanp (bool x) true)
+(defun booleanp (x) false)
+
+; translate char<, char<= to charLT, charLTE
+(defun: auto charLT (char x char y) (< x y))
+(defun: auto charLTE (char x char y) (>= x y))
+
+; translate char>, char>= to charGT, charGTE
+(defun: auto charGT (char x char y) (> x y))
+(defun: auto charGTE (char x char y) (>= x y))
+
+
+;; testing primes
+(defun inner (k n)
+   (cond
+     ((> (* k k) n) 1)
+     ((= 0 (mod n k)) 0)
+     (t (inner (+ k 2) n))))
+
+(defun is_prime (n)
+   (cond
+      ((= n 2) 1)
+      ((< n 2) 0)
+      ((= 0 (mod n 2)) 0)
+      (t (inner 3 n))))
+
+(defun process (n m sum)
+   (cond ((= n m) sum)
+         (t (process (+ n 1) m (+ sum (is_prime n))))))
+
+
+(main
+
+  ; test true
+  (prn t)
+
+  ; test nil
+  (prn nil)
+  ; TODO: reduce `nil` from two concepts to one
+
+  ; test boolean not
+  (prn (not t))
+  (prn (not nil))
+
+  (prn (equal t t))
+  (prn (equal nil t))
+
+
+  ; test * operator
+  (prn (* 2 2 2)) ; => 8 (works)
+
+  ; test + operator
+  (prn (+ 2 2 2)) ; => 6 (works)
+
+  ; test - operator
+  (prn (- 10 2 2)) ; => 6 (works)
+
+  ; test / operator
+  (prn (/ 12 2 2)) ; => 3 (works)
+
+  ; test /= operator
+  (prn (/= 3 2)) ; => t (works)
+
+  ; test 1+ operator
+  (prn (1+ 3)) ; => 4 (works)
+
+  ; test 1- operator
+  (prn (1- 3)) ; => 2 (works)
+
+  ; test LTE
+  (prn (<= 3 3)) ; => true (works)
+
+  (prn (<= 3 4)) ; => true (works)
+
+  ; TODO: other comparison ops
+
+  (def i 1)
+  (prn (+ (@ i) 1)) ; => 2 (works)
+
+  (prn (abs -10)) ; => 10 (works)
+
+  (prn (and t t)) ; => 1
+  (prn (or nil t)) ; => 1
+
+  (prn (xor t nil)) ; => 1 (works)
+  (prn (xor t t)) ; => 0
+
+  (prn (natp 3)) ; => 1  (works)
+  (prn (natp "one")) ; => 0 (works)
+
+  ; build and print a heterogeneous list
+  (prn
+    (cons 222 (cons 3.0f (cons 1.0f (cons (std::string "testing") (cnil))))))
+
+
+  (prn (car (cons 222 (cnil))))  ; works
+  (prn (car (cdr (cons 222 (cons 10 (cnil)))))) ; works
+
+  (prn (endp (cnil)))  ; works
+
+  (prn (cond 
+         ((< 1 0) "GT1")
+         ((> 1 0) "GT2")
+         (t "Hello")))  ; works!
+  
+
+  (prn 3)
+  
+  ;(prn (process 1 1000 0))
+
+  )

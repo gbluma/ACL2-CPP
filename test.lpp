@@ -1,0 +1,28 @@
+
+(include <functional> <windows.h> "prelude.cpp")
+        
+(defn square [x y z] 
+    (prn z) 
+    (return (* x y)))
+    
+(defn call_some_func_with_three (f) 
+    (return (f 3)))
+    
+(defn printIt (x) (prn x))
+
+(defn Fact [n] 
+    (if (<= n 1) (return 1.0))
+    (return (* n (Fact (- n 1.0)))))
+    
+(defn compose (f g)
+  (return (fn (x) (return (g (f x)))))) 
+
+(main 
+    (prn (square 3.5 2.1 "Hello"))
+    (prn ((fn (x y) (return (* x y))) 1000 2 ))
+    (prn (Fact 5))
+    (call_some_func_with_three printIt<int>)
+    (prn ((compose (fn (x) (return (* 2 x))) 
+                   (fn (x) (return (+ 3 x)))) 
+           10))
+    )
